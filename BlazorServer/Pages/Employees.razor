@@ -5,121 +5,102 @@
 <PageTitle>Employees</PageTitle>
 @inject ISnackbar SnackBar
 @inject IEmployee EmployeeService
+@inject NavigationManager navigationManager
 
 
 
-<MudCard Elevation="25" Style="">
+<MudCard Elevation="25">
     <MudCardHeader>
         <CardHeaderContent>
             <MudText Typo="Typo.h6">Add / Edit Employees</MudText>
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
-        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-        <MudTextField @bind-Value="Employee.Name" Label="Name" Variant="Variant.Text" Required="true" Margin="Margin.Normal"  RequiredError="Password is required!"></MudTextField>
-        <MudTextField @bind-Value="Employee.Email" Label="Email" Variant="Variant.Text" Margin="Margin.Normal" Required="true" RequiredError="Password is required!"></MudTextField>
-        <br />
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save Employee</MudButton>
-        </MudForm>
+       <EditForm Model="@Employee" OnValidSubmit="Save">
+           <DataAnnotationsValidator/>
+            <MudTextField @bind-Value="Employee.Name" Label="Name" Variant="Variant.Text" For="@(() => Employee.Name)" Required="true" Margin="Margin.Normal" RequiredError="Password is required!"></MudTextField>
+            <MudTextField @bind-Value="Employee.Email" Label="Email" Variant="Variant.Text" For="@(() => Employee.Email)" Margin="Margin.Normal" Required="true" RequiredError="Password is required!"></MudTextField>
+            @* <label>
+            Designation:
+            </label>
+            <select class="form-control form-select" @bind="Employee.Designation">
+            <option selected disabled>Select Designation</option>
+            @foreach (var value in Enum.GetValues(typeof(Designation)))
+            {
+            <option>@value</option>
+            }
+            </select>*@
+            @*<MudSelect Margin="Margin.Dense" T="string" Label="Coffee" Variant="Variant.Text"@bind-Value="Employee.Designation" >
+            @foreach (var value in Designation))
+            {
+            <MudSelectItem Value="@(value.ToString())" />
+            }
+
+            </MudSelect>*@
+            @*<MudSelect T="string" Label="Designation" @bind-Value="Employee.Designation">
+                @foreach (var value in Enum.GetValues(typeof(Designation)))
+                {
+                    <MudSelectItem T="string" Value="@value.ToString()">@value</MudSelectItem>
+                }
+            </MudSelect>*@
+            <br />
+             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save Employee</MudButton>
+        </EditForm>
     </MudCardContent>
 </MudCard>
 <br />
-<MudTable Elevation="25" Items="EmployeesList" Filter="new Func<EmployeeDTO, bool>(Search)" @bind-Employee="Employee">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Employees</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="searchString" Placeholder="Search for Employees..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Name</MudTh>
-        <MudTh>Email</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Email">@context.Email</MudTd>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-    </RowTemplate>
-</MudTable>
+<div id="unique_id_scroll_section" class="ma-0" style="height:300px;overflow: auto;">
+    <MudOverlay Visible="isVisible" DarkBackground="true" Absolute="true">
+            <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+        </MudOverlay>
+    <MudTable Elevation="25" Items="EmployeesList" Filter="new Func<EmployeeDTO, bool>(Search)" @bind-Employee="Employee">
+
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Employees</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search for Employees..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    <MudScrollToTop TopOffset="100"
+                    OnScroll="OnScroll"
+                    Selector="#unique_id_scroll_section"
+                    VisibleCssClass="visible absolute"
+                    HiddenCssClass="invisible">
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.ArrowUpward" Color="Color">Go to top</MudButton>
+    </MudScrollToTop>
+</div>
 <style>
     .pt-16, .py-16 {
-    padding-top: 0px !important;
-}
+        padding-top: 0px !important;
+    }
+
+    .mt-16, .my-16 {
+        margin-top: 10px !important;
+    }
+
+    .mud-card-content {
+        padding-top: 0px;
+    }
+
+    .mud-card-header {
+        padding-bottom: 0px;
+    }
 </style>
 
 
 
-@code{
-    bool success;
-    MudForm form;
-    string[] errors = { };
-    private string searchString = "";
-    private string editordelete = "save";
-    private EmployeeDTO Employee = new EmployeeDTO();
-    private List<EmployeeDTO> EmployeesList = new List<EmployeeDTO>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await GetEmployees();
-    }
-    private async Task<List<EmployeeDTO>> GetEmployees()
-    {
-        EmployeesList =await  EmployeeService.GetEmployees();
-        EmployeesList.Reverse();
-        return EmployeesList;
-    }
-    private bool Search(EmployeeDTO Employee)
-    {
-        if (string.IsNullOrWhiteSpace(searchString)) return true;
-        if (Employee.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-        )
-        {
-            return true;
-        }
-        return false;
-    }
-    private async  Task Save()
-    {
-        if (editordelete=="edit")
-        {
-            var res=await EmployeeService.UpdateEmployee(Employee);
-            if (res)
-            {
-                editordelete = "save";
-                SnackBar.Add("Employee Saved.", Severity.Success);
-                Employee = new EmployeeDTO();
-            await GetEmployees();
-            }
-        }
-        else if(editordelete=="save")
-        {
-             var res=  await EmployeeService.AddEmployee(Employee);
-        Employee = new EmployeeDTO();
-        if (res==true)
-        {
-            SnackBar.Add("Employee Saved.", Severity.Success);
-            await GetEmployees();
-        }
-        }
-       
-
-    }
-    private void Edit(int id)
-    {
-        Employee = EmployeesList.FirstOrDefault(c => c.Id == id);
-        editordelete = "edit";
-    }
-    private async Task Delete(int id)
-    {
-       var res= await EmployeeService.DeleteEmployee(id);
-        if (res)
-        {
-             SnackBar.Add("Employee Deleted.", Severity.Error);
-        await GetEmployees();
-        }
-       
-    }
-}
 
