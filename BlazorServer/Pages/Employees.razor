@@ -15,10 +15,12 @@
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
-        <MudTextField @bind-Value="Employee.Name" Label="Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
-        <MudTextField @bind-Value="Employee.Email" Label="Email" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        <MudTextField @bind-Value="Employee.Name" Label="Name" Variant="Variant.Text" Required="true" Margin="Margin.Normal"  RequiredError="Password is required!"></MudTextField>
+        <MudTextField @bind-Value="Employee.Email" Label="Email" Variant="Variant.Text" Margin="Margin.Normal" Required="true" RequiredError="Password is required!"></MudTextField>
         <br />
         <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save Employee</MudButton>
+        </MudForm>
     </MudCardContent>
 </MudCard>
 <br />
@@ -31,14 +33,10 @@
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Email</MudTh>
-        @*<MudTh>Phone Number</MudTh>
-        <MudTh>Actions</MudTh>*@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Email">@context.Email</MudTd>
-        @*<MudTd DataLabel="LastName">@context.LastName</MudTd>
-        <MudTd DataLabel="PhoneNumber">@context.PhoneNumber</MudTd>*@
         <MudTd DataLabel="">
             <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
             <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
@@ -54,6 +52,9 @@
 
 
 @code{
+    bool success;
+    MudForm form;
+    string[] errors = { };
     private string searchString = "";
     private string editordelete = "save";
     private EmployeeDTO Employee = new EmployeeDTO();
