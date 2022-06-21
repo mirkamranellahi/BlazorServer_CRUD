@@ -1,0 +1,124 @@
+﻿@page "/employee"
+
+@using BlazorServer.Data
+@using MudBlazor
+<PageTitle>Employees</PageTitle>
+@inject ISnackbar SnackBar
+@inject IEmployee EmployeeService
+
+
+
+<MudCard Elevation="25" Style="">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Add / Edit Employees</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTextField @bind-Value="Employee.Name" Label="Name" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+        <MudTextField @bind-Value="Employee.Email" Label="Email" Variant="Variant.Text" Margin="Margin.Normal"></MudTextField>
+        <br />
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save Employee</MudButton>
+    </MudCardContent>
+</MudCard>
+<br />
+<MudTable Elevation="25" Items="EmployeesList" Filter="new Func<EmployeeDTO, bool>(Search)" @bind-Employee="Employee">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Employees</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search for Employees..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Email</MudTh>
+        @*<MudTh>Phone Number</MudTh>
+        <MudTh>Actions</MudTh>*@
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+        @*<MudTd DataLabel="LastName">@context.LastName</MudTd>
+        <MudTd DataLabel="PhoneNumber">@context.PhoneNumber</MudTd>*@
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(()=>Edit(@context.Id))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(()=>Delete(@context.Id))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+<style>
+    .pt-16, .py-16 {
+    padding-top: 0px !important;
+}
+</style>
+
+
+
+@code{
+    private string searchString = "";
+    private string editordelete = "save";
+    private EmployeeDTO Employee = new EmployeeDTO();
+    private List<EmployeeDTO> EmployeesList = new List<EmployeeDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetEmployees();
+    }
+    private async Task<List<EmployeeDTO>> GetEmployees()
+    {
+        EmployeesList =await  EmployeeService.GetEmployees();
+        EmployeesList.Reverse();
+        return EmployeesList;
+    }
+    private bool Search(EmployeeDTO Employee)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        if (Employee.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+        )
+        {
+            return true;
+        }
+        return false;
+    }
+    private async  Task Save()
+    {
+        if (editordelete=="edit")
+        {
+            var res=await EmployeeService.UpdateEmployee(Employee);
+            if (res)
+            {
+                editordelete = "save";
+                SnackBar.Add("Employee Saved.", Severity.Success);
+                Employee = new EmployeeDTO();
+            await GetEmployees();
+            }
+        }
+        else if(editordelete=="save")
+        {
+             var res=  await EmployeeService.AddEmployee(Employee);
+        Employee = new EmployeeDTO();
+        if (res==true)
+        {
+            SnackBar.Add("Employee Saved.", Severity.Success);
+            await GetEmployees();
+        }
+        }
+       
+
+    }
+    private void Edit(int id)
+    {
+        Employee = EmployeesList.FirstOrDefault(c => c.Id == id);
+        editordelete = "edit";
+    }
+    private async Task Delete(int id)
+    {
+       var res= await EmployeeService.DeleteEmployee(id);
+        if (res)
+        {
+             SnackBar.Add("Employee Deleted.", Severity.Error);
+        await GetEmployees();
+        }
+       
+    }
+}
+
