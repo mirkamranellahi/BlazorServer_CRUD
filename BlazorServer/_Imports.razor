@@ -9,3 +9,10 @@
 @using MudBlazor
 @using BlazorServer
 @using BlazorServer.Shared
+
+@inject IEmployee EmployeeService
+@inject NavigationManager navigationManager
+@inject ISnackbar SnackBar
+@inject IDialogService DialogService
+
+@using BlazorServer.Data
