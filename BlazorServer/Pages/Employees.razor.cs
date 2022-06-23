@@ -1,6 +1,7 @@
 ﻿using BlazorServer.Data;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using BlazorServer.Components;
 
 namespace BlazorServer.Pages
 {
@@ -8,14 +9,9 @@ namespace BlazorServer.Pages
     {
         private bool isVisible;
         private string searchString = "";
-        private string editordelete = "save";
         private EmployeeDTO Employee = new EmployeeDTO();
         private List<EmployeeDTO> EmployeesList = new List<EmployeeDTO>();
-    //    private string[] Designation =
-    //{
-    //    "PM", "Architect", " SSE", "SE","ASE",
-        
-    //};
+       
         Color Color = Color.Success;
 
         protected override async Task OnInitializedAsync()
@@ -63,45 +59,54 @@ namespace BlazorServer.Pages
             }
             return false;
         }
-        private async Task Save()
+       
+
+        private async void OpenDailog()
         {
-            if (editordelete == "edit")
+            var dialog = DialogService.Show<Add_Employee_Dialog>("add Employee", new DialogOptions { DisableBackdropClick = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+            var res = await dialog.GetReturnValueAsync<bool?>();
+            if (Convert.ToBoolean(res))
             {
-                var res = await EmployeeService.UpdateEmployee(Employee);
-                if (res)
-                {
-                    editordelete = "save";
-                    SnackBar.Add("Employee Saved.", Severity.Success);
-                    Employee = new EmployeeDTO();
-                    await GetEmployees();
-                }
+                await GetEmployees();
+                StateHasChanged();
+                SnackBar.Add("Employee Saved.", Severity.Success);
             }
-            else if (editordelete == "save")
-            {
-                var res = await EmployeeService.AddEmployee(Employee);
-                Employee = new EmployeeDTO();
-                if (res == true)
-                {
-                    SnackBar.Add("Employee Saved.", Severity.Success);
-                    await GetEmployees();
-                }
-            }
-
-
         }
-        private void Edit(int id)
+
+        private async void Edit(int id)
         {
             Employee = EmployeesList.FirstOrDefault(c => c.Id == id);
-            editordelete = "edit";
+            DialogParameters keyValuePairs = new DialogParameters();
+            keyValuePairs.Add("Employee", Employee);
+            var dialog = DialogService.Show<Add_Employee_Dialog>("add Employee",keyValuePairs, new DialogOptions { DisableBackdropClick = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+            var res = await dialog.GetReturnValueAsync<bool?>();
+            if (Convert.ToBoolean(res))
+            {
+                StateHasChanged();
+                SnackBar.Add("Employee Saved.", Severity.Success);
+            }
         }
         private async Task Delete(int id)
         {
-            var res = await EmployeeService.DeleteEmployee(id);
-            if (res)
+
+            var parameters = new DialogParameters();
+            parameters.Add("ContentText", "Are you sure you want to Delete?");
+            parameters.Add("ButtonText", "Yes");
+            parameters.Add("Color", Color.Error);
+
+            var result = DialogService.Show<Confirm_Dialog>("Confirm", parameters, new DialogOptions { DisableBackdropClick = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+            var res = await result.GetReturnValueAsync<bool?>();
+            if (Convert.ToBoolean(res))
             {
-                SnackBar.Add("Employee Deleted.", Severity.Error);
-                await GetEmployees();
+                if (await EmployeeService.DeleteEmployee(id))
+                {
+                    SnackBar.Add("Employee Deleted.", Severity.Error);
+                    await GetEmployees();
+                    StateHasChanged();
+                }
+
             }
+
 
         }
     }

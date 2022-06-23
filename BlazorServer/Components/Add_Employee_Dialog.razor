@@ -1,0 +1,76 @@
+﻿@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1" Class="mr-3 mb-n1" />
+            @addorupdate Employee
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm Model="@Employee" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudTextField @bind-Value="Employee.Name" Label="Name" Variant="Variant.Text" For="@(() => Employee.Name)" Required="true" Margin="Margin.Normal" RequiredError="Password is required!"></MudTextField>
+            <MudTextField @bind-Value="Employee.Email" Label="Email" Variant="Variant.Text" For="@(() => Employee.Email)" Margin="Margin.Normal" Required="true" RequiredError="Password is required!"></MudTextField>
+            <br />
+            <MudText Align="Align.Right">
+                <MudButton Variant="Variant.Filled" Color="Color.Error" Class="mr-3" OnClick="Cancel">Cancel</MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">@addorupdate Employee</MudButton>
+            </MudText>
+
+
+        </EditForm>
+    </DialogContent>
+
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+
+
+    public string addorupdate { get; set; } = "Add";
+
+    [Parameter]
+    public EmployeeDTO Employee { get; set; } = new EmployeeDTO();
+
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    protected override void OnInitialized()
+    {      
+
+        addorupdate = !String.IsNullOrEmpty(Employee.Name)  ? "Update" : "Add";
+    }
+
+
+    private async Task Save()
+    {
+        if (addorupdate == "Add")
+        {
+            
+            if (await EmployeeService.AddEmployee(Employee))
+            {
+                
+                Employee = new EmployeeDTO();
+                MudDialog.Close(DialogResult.Ok(true));
+
+            }
+        }
+        else if (addorupdate == "Update")
+        {
+            if (await EmployeeService.UpdateEmployee(Employee))
+            {
+                
+                MudDialog.Close(DialogResult.Ok(true));
+                Employee = new EmployeeDTO();
+            }
+        }
+
+
+    }
+
+}
+

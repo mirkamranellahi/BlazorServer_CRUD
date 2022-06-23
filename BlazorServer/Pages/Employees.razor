@@ -1,55 +1,11 @@
-﻿@page "/employee"
+﻿@page "/employees"
 
 @using BlazorServer.Data
 @using MudBlazor
 <PageTitle>Employees</PageTitle>
-@inject ISnackbar SnackBar
-@inject IEmployee EmployeeService
-@inject NavigationManager navigationManager
 
-
-
-<MudCard Elevation="25">
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6">Add / Edit Employees</MudText>
-        </CardHeaderContent>
-    </MudCardHeader>
-    <MudCardContent>
-       <EditForm Model="@Employee" OnValidSubmit="Save">
-           <DataAnnotationsValidator/>
-            <MudTextField @bind-Value="Employee.Name" Label="Name" Variant="Variant.Text" For="@(() => Employee.Name)" Required="true" Margin="Margin.Normal" RequiredError="Password is required!"></MudTextField>
-            <MudTextField @bind-Value="Employee.Email" Label="Email" Variant="Variant.Text" For="@(() => Employee.Email)" Margin="Margin.Normal" Required="true" RequiredError="Password is required!"></MudTextField>
-            @* <label>
-            Designation:
-            </label>
-            <select class="form-control form-select" @bind="Employee.Designation">
-            <option selected disabled>Select Designation</option>
-            @foreach (var value in Enum.GetValues(typeof(Designation)))
-            {
-            <option>@value</option>
-            }
-            </select>*@
-            @*<MudSelect Margin="Margin.Dense" T="string" Label="Coffee" Variant="Variant.Text"@bind-Value="Employee.Designation" >
-            @foreach (var value in Designation))
-            {
-            <MudSelectItem Value="@(value.ToString())" />
-            }
-
-            </MudSelect>*@
-            @*<MudSelect T="string" Label="Designation" @bind-Value="Employee.Designation">
-                @foreach (var value in Enum.GetValues(typeof(Designation)))
-                {
-                    <MudSelectItem T="string" Value="@value.ToString()">@value</MudSelectItem>
-                }
-            </MudSelect>*@
-            <br />
-             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Save Employee</MudButton>
-        </EditForm>
-    </MudCardContent>
-</MudCard>
 <br />
-<div id="unique_id_scroll_section" class="ma-0" style="height:300px;overflow: auto;">
+<div id="unique_id_scroll_section" class="ma-0" style="height:540px;overflow: auto;">
     <MudOverlay Visible="isVisible" DarkBackground="true" Absolute="true">
             <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
         </MudOverlay>
@@ -59,6 +15,7 @@
             <MudText Typo="Typo.h6">Employees</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search for Employees..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.PersonAddAlt1" Class="ml-8 mr-4" Label="Add Employee"  @onclick="@(()=>OpenDailog())"/>
         </ToolBarContent>
         <HeaderContent>
             <MudTh>Name</MudTh>
