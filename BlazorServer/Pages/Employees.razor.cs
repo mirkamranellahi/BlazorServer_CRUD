@@ -28,7 +28,8 @@ namespace BlazorServer.Pages
             {
                 isVisible = false;
                 navigationManager.NavigateTo("/");
-                SnackBar.Add("Something went wrong", Severity.Error);
+                Console.Write(ex.Message);
+                SnackBar.Add(ex.Message, Severity.Error);
             }
         }
         private async Task<List<EmployeeDTO>> GetEmployees()

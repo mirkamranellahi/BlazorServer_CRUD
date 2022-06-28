@@ -8,6 +8,7 @@ using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 builder.Services.AddDbContextPool<BlazorServerDBContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(BlazorServerDBContext))));
 
@@ -15,7 +16,7 @@ builder.Services.AddScoped<IRepository, Repository>();
 
 builder.Services.AddScoped<IEmployee, EmployeeService>();
 
-// Add services to the container.
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
