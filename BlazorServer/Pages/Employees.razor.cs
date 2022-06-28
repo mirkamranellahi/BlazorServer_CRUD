@@ -28,7 +28,7 @@ namespace BlazorServer.Pages
             {
                 isVisible = false;
                 navigationManager.NavigateTo("/");
-                Console.Write(ex.Message);
+                Console.WriteLine(ex.StackTrace);
                 SnackBar.Add(ex.Message, Severity.Error);
             }
         }
